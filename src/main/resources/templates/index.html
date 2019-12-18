@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>sign in</title>
+</head>
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<style>
+    .input{
+        length: 120px;
+    }
+    .div {
+        margin: 0 auto;
+    }
+</style>
+<body>
+        <div class="div" id="app">
+            username: <input class="input" type="text" v-bind:value="user.username" >
+            password: <input class="input" type="password" v-bind:value="user.password">
+        </div>
+        <div class="div">
+            <button  v-on:click="login"> sign in </button>
+            <button   v-on:click="rigister"> register </button>
+        </div>
+</body>
+
+<script>
+    var rooturl = "http://localhost:8080";
+    new Vue({
+        el: '#app',
+        data: {
+            user:{
+                id: "",
+                username: "",
+                password: ""
+            }
+        },
+        methods: {
+            login: function (event) {
+                var that = this;
+                $.ajax({
+                    type: "POST",
+                    url: rooturl + "/login",
+                    data: that.data.user,
+                    dataType: "json",
+                    success: function (result) {
+                        alert(result)
+                        document.location = './bookinfo.html'
+                    },
+                    error: function (result) {
+                        alert(result)
+                    }
+                });
+            },
+            rigister: function (event) {
+                console.log('this is rigister')
+                var that = this;
+                $.ajax({
+                    type: "POST",
+                    url: rooturl + "/login",
+                    data: that.data.user,
+                    dataType: "json",
+                    success: function (result) {
+                        alert(result)
+                        that.data.user.password = ''
+                    },
+                    error: function (result) {
+                        alert(result)
+                    }
+                });
+            }
+        }
+    });
+</script>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>图书信息</title>
+</head>
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<body>
+<div id="app">
+    <div>
+        <table>
+            <tr>
+                <th>图书编号</th>
+                <th>图书名称</th>
+                <th>图书单价(元)</th>
+                <th>图书数量</th>
+                <th> <button v-on:click>edit</button></th>
+            </tr>
+            <tr v-for="book in books">
+                <td ><span v-if="diplayflag">{{book.number}}</span> <input v-if="updateflag" v-bind:value="updatebook.number"></td>
+                <td><span  v-if="diplayflag">{{book.bookName}}</span> <input v-if="updateflag" v-bind:value="updatebook.bookName"></td>
+                <td ><span v-if="diplayflag">{{book.pirce}}</span><input  v-if="updateflag" v-bind:value="updatebook.pirce"></td>
+                <td ><span v-if="diplayflag">{{book.count}}</span> <input v-if="updateflag" v-bind:value="updatebook.count"></td>
+                <button v-on:click="delete" v-bind:id="bookId">delete book</button>
+                <button v-on:click="update" v-bind:id="bookId">update book</button>
+            </tr>
+            <tr v-if="show">
+                <td><input v-bind:value="addbook.number"></td>
+                <td><input v-bind:value="addbook.bookName"></td>
+                <td><input v-bind:value="addbook.pirce"></td>
+                <td><input v-bind:value="addbook.count"></td>
+                <button v-on:click="add">add book</button>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <button v-on:click="add"> +++++++ </button>
+
+    </div>
+</div>
+
+</body>
+<script>
+    var rooturl = "http://localhost:8080";
+    new Vue({
+        el: '#app',
+        data: {
+            books: [],
+            addbook: {},
+            updatebook:{},
+            show: false,
+            updateflag: false,
+            diplayflag: true
+        },
+        methods: {
+            addable: function(event) {
+                this.show =true;
+            },
+            add: function (event) {
+                var that = this;
+                $.ajax({
+                    type: "POST",
+                    url: rooturl + "/add",
+                    data: that.data.addbook,
+                    dataType: "json",
+                    success: function (result) {
+                        alert(result)
+                    },
+                    error: function (result) {
+                        alert(result)
+                    }
+                });
+                that.queryall()
+            },
+            updateable: function(event) {
+                this.data.diplayflag = false;
+                this.data.updateflag = true;
+            },
+            update: function (event) {
+                var that = this;
+                $.ajax({
+                    type: "POST",
+                    url: rooturl + "/update",
+                    data: that.data.updatebook,
+                    dataType: "json",
+                    success: function (result) {
+                        alert(result)
+                    },
+                    error: function (result) {
+                        alert(result)
+                    }
+                });
+                that.queryall()
+            },
+
+            delete: function (event) {
+                var that = this;
+                var id = $(event).getAttribute("id");
+                $.ajax({
+                    type: "GET",
+                    url: rooturl + "/delete/"+ id,
+                    success: function (result) {
+                        alert(result)
+                    },
+                    error: function (result) {
+                        alert(result)
+                    }
+                });
+                that.queryall()
+            },
+
+            query: function (event) {
+                $.ajax({
+                    type: "GET",
+                    url: rooturl + "/query/" + id,
+                    success: function (result) {
+                    },
+                    error: function (result) {
+                        alert(result)
+                    }
+                });
+            },
+
+            queryall: function () {
+                var that = this;
+                $.ajax({
+                    type: "GET",
+                    url: rooturl + "/queryall",
+                    success: function (result) {
+                        that.data.books = result
+                    },
+                    error: function (result) {
+                        alert(result)
+                    }
+                });
+            }
+        }
+    })
+</script>
+
+</html>
