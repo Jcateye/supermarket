@@ -1,41 +1,134 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-model="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>图书信息</title>
+    <style type="text/css">
+
+        body {
+            width: auto;
+            height: auto;
+            padding: 0;
+            margin: 20px 0;
+            font-size: 12px;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+        }
+
+        ul {
+            clear: both;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        #tableFrame {
+            width: 1200px; /*需要修改*/
+            height: auto;
+            border-top: #000 1px solid;
+            border-left: #000 1px solid;
+            padding: 0;
+            margin: 0 auto;
+            font-size: 12px;
+        }
+
+        #tableFrame:after {
+            content: ".";
+            display: block;
+            height: 0;
+            clear: both;
+            visibility: hidden;
+        }
+
+        li {
+            float: left;
+            display: block;
+            width: 140px; /*需要修改*/
+            height: auto;
+            padding: 2px;
+            margin: 0;
+            border-right: #000 1px solid;
+            border-bottom: #000 1px solid;
+            line-height: 16px;
+            color: #000;
+        }
+
+        /* 表格标题*/
+        #tableFrameTitle ul {
+        }
+
+        #tableFrameTitle ul li {
+            background: gray;
+            text-align: center;
+            color: #fff;
+        }
+
+        /* 表格内容*/
+        #tableCase ul {
+        }
+
+        #tableCase ul li {
+        }
+
+        /* 单个表格特定样式*/
+        .tableCaseThree {
+            color: #329A02;
+        }
+
+        .tableCaseFive {
+            color: #f00;
+        }
+
+        .tableCaseSeven {
+            color: #f00;
+        }
+
+    </style>
 </head>
 <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 <body>
-<div id="app">
-    <div>
-        <table>
-            <tr>
-                <th>图书编号</th>
-                <th>图书名称</th>
-                <th>图书单价(元)</th>
-                <th>图书数量</th>
-                <th> <button v-on:click>edit</button></th>
-            </tr>
-            <tr v-for="book in books">
-                <td ><span v-if="diplayflag">{{book.number}}</span> <input v-if="updateflag" v-bind:value="updatebook.number"></td>
-                <td><span  v-if="diplayflag">{{book.bookName}}</span> <input v-if="updateflag" v-bind:value="updatebook.bookName"></td>
-                <td ><span v-if="diplayflag">{{book.pirce}}</span><input  v-if="updateflag" v-bind:value="updatebook.pirce"></td>
-                <td ><span v-if="diplayflag">{{book.count}}</span> <input v-if="updateflag" v-bind:value="updatebook.count"></td>
-                <button v-on:click="delete" v-bind:id="bookId">delete book</button>
-                <button v-on:click="update" v-bind:id="bookId">update book</button>
-            </tr>
-            <tr v-if="show">
-                <td><input v-bind:value="addbook.number"></td>
-                <td><input v-bind:value="addbook.bookName"></td>
-                <td><input v-bind:value="addbook.pirce"></td>
-                <td><input v-bind:value="addbook.count"></td>
-                <button v-on:click="add">add book</button>
-            </tr>
-        </table>
+<div id="tableFrame">
+    <div id="tableFrameTitle">
+        <ul>
+            <li>图书编号</li>
+            <li>图书名称</li>
+            <li>图书单价(元)</li>
+            <li>图书数量</li>
+            <li>选择</li>
+        </ul>
     </div>
-    <div>
-        <button v-on:click="add"> +++++++ </button>
+    <div id="tableCase">
+        <!--此处开始循环 -->
+        <ul v-for="book in books">
+                <span v-if="!show">
+                <li class="tableCaseOne">{{book.number}}</li>
+                <li class="tableCaseTwo">{{book.bookName}}</li>
+                <li class="tableCaseThree">{{book.pirce}}</li>
+                <li class="tableCaseFour">{{book.count}}</li>
+                </span>
+            <span v-if="show">
+                <li class="tableCaseOne"><input name="number" type="text" v-model:value="book.number"></li>
+                <li class="tableCaseTwo"><input name="bookName" type="text" v-model:value="book.bookName"></li>
+                <li class="tableCaseThree"><input name="pirce" type="text" v-model:value="book.pirce"></li>
+                <li class="tableCaseFour"><input name="count" type="text" v-model:value="book.count"></li>
+                </span>
+            <li><input name="check" type="checkbox" v-bind:value="book.bookId" v-model="checkids"/></li>
+        </ul>
+        <!--到此循环结束 -->
+    </div>
+    <div id="tableFoot">
+        <ul>
+            <li>
+                <button v-on:click="deletes">删除</button>
+            </li>
+            <li>
+                <button v-on:click="update">更新</button>
+            </li>
+            <li>
+                <button v-on:click="editable">编辑</button>
+            </li>
+        </ul>
 
     </div>
 </div>
@@ -43,26 +136,62 @@
 </body>
 <script>
     var rooturl = "http://localhost:8080";
-    new Vue({
-        el: '#app',
+    var vue = new Vue({
+        el: '#tableFrame',
         data: {
             books: [],
             addbook: {},
-            updatebook:{},
+            updatebook: {},
+            checkids: [],
             show: false,
             updateflag: false,
             diplayflag: true
         },
         methods: {
-            addable: function(event) {
-                this.show =true;
+            editable: function (event) {
+                debugger
+                this.show = true;
             },
             add: function (event) {
                 var that = this;
+                debugger
                 $.ajax({
                     type: "POST",
                     url: rooturl + "/add",
-                    data: that.data.addbook,
+                    data: that.addbook,
+                    contentType: 'application/json',
+                    dataType: "json",
+                    success: function (result) {
+                        alert("update success!")
+                    },
+                    error: function (result) {
+                        alert("update failed!")
+                    }
+                });
+                that.queryall()
+            },
+            updateable: function (event) {
+                this.diplayflag = false;
+                this.updateflag = true;
+            },
+            update: function (event) {
+                var that = this;
+                var updatebooks = []
+
+                for (var i = 0; i < that.books.length; i++) {
+                    for (var j = 0; j < that.checkids.length; j++) {
+                        if (that.checkids[j] == that.books[i].bookId) {
+                            updatebooks.push(that.books[i]);
+                        }
+                    }
+                }
+                console.log(JSON.stringify(updatebooks))
+                debugger
+                $.ajax({
+                    type: "POST",
+                    url: rooturl + "/update",
+                    data: JSON.stringify(updatebooks),
+                    contentType: 'application/json',
                     dataType: "json",
                     success: function (result) {
                         alert(result)
@@ -72,18 +201,15 @@
                     }
                 });
                 that.queryall()
+                that.show = false;
             },
-            updateable: function(event) {
-                this.data.diplayflag = false;
-                this.data.updateflag = true;
-            },
-            update: function (event) {
+
+            delete: function (event) {
                 var that = this;
+                var id = $(event).getAttribute("id");
                 $.ajax({
-                    type: "POST",
-                    url: rooturl + "/update",
-                    data: that.data.updatebook,
-                    dataType: "json",
+                    type: "GET",
+                    url: rooturl + "/delete/" + id,
                     success: function (result) {
                         alert(result)
                     },
@@ -94,12 +220,13 @@
                 that.queryall()
             },
 
-            delete: function (event) {
+            deletes: function (event) {
+                debugger
                 var that = this;
-                var id = $(event).getAttribute("id");
                 $.ajax({
-                    type: "GET",
-                    url: rooturl + "/delete/"+ id,
+                    type: "POST",
+                    url: rooturl + "/delete",
+                    data: that.checkids,
                     success: function (result) {
                         alert(result)
                     },
@@ -128,15 +255,20 @@
                     type: "GET",
                     url: rooturl + "/queryall",
                     success: function (result) {
-                        that.data.books = result
+                        that.books = result
                     },
                     error: function (result) {
                         alert(result)
                     }
                 });
             }
+        },
+        mounted() {
+            this.queryall()
         }
     })
+
+
 </script>
 
 </html>

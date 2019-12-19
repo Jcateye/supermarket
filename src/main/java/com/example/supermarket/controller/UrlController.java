@@ -10,4 +10,9 @@ public class UrlController {
     public String index (){
         return "index";
     }
+
+    @RequestMapping("/book")
+    public String book (){
+        return "bookinfo";
+    }
 }

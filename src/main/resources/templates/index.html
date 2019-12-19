@@ -42,7 +42,7 @@
                 $.ajax({
                     type: "POST",
                     url: rooturl + "/login",
-                    data: that.data.user,
+                    data: that.user,
                     dataType: "json",
                     success: function (result) {
                         alert(result)
@@ -59,11 +59,11 @@
                 $.ajax({
                     type: "POST",
                     url: rooturl + "/login",
-                    data: that.data.user,
+                    data: that.user,
                     dataType: "json",
                     success: function (result) {
                         alert(result)
-                        that.data.user.password = ''
+                        that.user.password = ''
                     },
                     error: function (result) {
                         alert(result)

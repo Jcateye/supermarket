@@ -28,22 +28,36 @@ public class GoodsController {
         return ResponseEntity.ok("添加成功: "+ goods.getBookName());
     }
 
-    @PostMapping("/udpate")
-    public ResponseEntity<String> update(@RequestBody@Validated Goods goods) {
-
+    @PostMapping("/update")
+    public ResponseEntity<String> update(@RequestBody@Validated List<Goods> goodsList) {
         try {
-            goodsMapper.update(goods);
+            for (Goods goods : goodsList) {
+                goodsMapper.update(goods);
+            }
         } catch (Exception e) {
             throw new RuntimeException("更新失败:  " + e.getMessage());
         }
 
-        return ResponseEntity.ok("更新成功: "+ goods.getBookName());
+        return ResponseEntity.ok("更新成功 ");
     }
 
     @GetMapping("/delete/{bookId}")
     public ResponseEntity<String> delete(@PathVariable String bookId) {
         try {
             goodsMapper.deleteByPrimaryKey(bookId);
+        } catch (Exception e) {
+            throw new RuntimeException("删除失败:  " + e.getMessage());
+        }
+
+        return ResponseEntity.ok("删除成功");
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<String> deletes(@RequestParam List<String> bookIds) {
+        try {
+            for (String bookid : bookIds) {
+                goodsMapper.deleteByPrimaryKey(bookid);
+            }
         } catch (Exception e) {
             throw new RuntimeException("删除失败:  " + e.getMessage());
         }

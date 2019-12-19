@@ -16,12 +16,12 @@ public interface GoodsMapper {
 
     @Update("UPDATE Goods SET " +
             "bookName=#{bookName}, pirce=#{pirce},count=#{count}, detail=#{detail}" +
-            "WHERE  USER = #{id}")
+            "WHERE  bookId = #{bookId}")
     int update(Goods goods);
 
     @Delete("DELETE FROM GOODS WHERE BOOKID=#{id}")
     int deleteByPrimaryKey(String id);
 
-    @Select("Select * From Goods")
+    @Select("Select * From Goods order by number")
     List<Goods> selectALl();
 }
