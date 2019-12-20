@@ -2,6 +2,7 @@ package com.example.supermarket.controller;
 
 import com.example.supermarket.mapper.UserMapper;
 import com.example.supermarket.pojo.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
@@ -16,18 +17,18 @@ public class UserController {
     @Resource
     private UserMapper userMapper;
 
-    @RequestMapping("/login")
+    @RequestMapping(value = "/login")
     public ResponseEntity signIn(@RequestBody User user) {
-        User user1 = userMapper.selectByPrimaryKey(user.getId());
+        User user1 = userMapper.selectByName(user.getUsername());
         if(user1 == null) {
-            throw new RuntimeException("用户不存在");
+            return new ResponseEntity("用户不存在", HttpStatus.INTERNAL_SERVER_ERROR);
         }else{
             if (StringUtils.isEmpty(user.getPassword()) || StringUtils.isEmpty(user.getPassword())) {
-                throw new RuntimeException("账号或者密码不能为空");
+                return new ResponseEntity("账号或者密码不能为空",HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            if (user1.getUsername() != user.getUsername() || user1.getPassword() != user.getPassword() ){
-                throw new RuntimeException("账号或者密码不正确");
+            if (!user1.getUsername().equals(user.getUsername())  || !user1.getPassword().equals(user.getPassword()) ){
+                return new  ResponseEntity("账号或者密码不正确", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
         return ResponseEntity.ok("登录成功");
@@ -36,16 +37,19 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody@Validated User user){
         if (StringUtils.isEmpty(user.getPassword()) || StringUtils.isEmpty(user.getPassword())) {
-            throw new RuntimeException("账号或者密码不能为空");
+            return new ResponseEntity("账号或者密码不能为空",HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        user.setId(UUID.randomUUID().toString());
+        user.setId(UUID.randomUUID().toString().replace("-", ""));
 
         try {
+            if(userMapper.selectByName(user.getUsername()) != null) {
+                return new ResponseEntity("用户名已存在",HttpStatus.INTERNAL_SERVER_ERROR );
+            }
             userMapper.insert(user);
         } catch (Exception e) {
-            throw new RuntimeException("注册失败" + e.getMessage());
+            return new ResponseEntity( "注册失败" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return ResponseEntity.ok("测试成功!");
+        return ResponseEntity.ok("注册成功!");
     }
 }

@@ -102,10 +102,10 @@
         <!--此处开始循环 -->
         <ul v-for="book in books">
                 <span v-if="!show">
-                <li class="tableCaseOne">{{book.number}}</li>
-                <li class="tableCaseTwo">{{book.bookName}}</li>
-                <li class="tableCaseThree">{{book.pirce}}</li>
-                <li class="tableCaseFour">{{book.count}}</li>
+                <li class="tableCaseOne"  >{{book.number}}</li>
+                <li class="tableCaseTwo"  >{{book.bookName}}</li>
+                <li class="tableCaseThree" >{{book.pirce}}</li>
+                <li class="tableCaseFour" >{{book.count}}</li>
                 </span>
             <span v-if="show">
                 <li class="tableCaseOne"><input name="number" type="text" v-model:value="book.number"></li>
@@ -115,6 +115,13 @@
                 </span>
             <li><input name="check" type="checkbox" v-bind:value="book.bookId" v-model="checkids"/></li>
         </ul>
+        <ul><span v-if="addable">
+                <li class="tableCaseOne"><input name="number" type="text" v-model:value="addbook.number"></li>
+                <li class="tableCaseTwo"><input name="bookName" type="text" v-model:value="addbook.bookName"></li>
+                <li class="tableCaseThree"><input name="pirce" type="text" v-model:value="addbook.pirce"></li>
+                <li class="tableCaseFour"><input name="count" type="text" v-model:value="addbook.count"></li>
+                </span>
+            </ul>
         <!--到此循环结束 -->
     </div>
     <div id="tableFoot">
@@ -124,6 +131,9 @@
             </li>
             <li>
                 <button v-on:click="update">更新</button>
+            </li>
+            <li>
+                <button v-on:click="add">添加</button>
             </li>
             <li>
                 <button v-on:click="editable">编辑</button>
@@ -140,12 +150,13 @@
         el: '#tableFrame',
         data: {
             books: [],
-            addbook: {},
             updatebook: {},
             checkids: [],
             show: false,
             updateflag: false,
-            diplayflag: true
+            diplayflag: true,
+            addable: false,
+            addbook: {"number": 0,"bookName":"","pirce": 0,"count": 0, id: ""}
         },
         methods: {
             editable: function (event) {
@@ -154,20 +165,37 @@
             },
             add: function (event) {
                 var that = this;
+
+                if (!that.addable) {
+                    that.addable = true;
+                    return
+                }
+                if (that.addbook == null) {
+                    return;
+                }
+                console.log(JSON.stringify(that.addbook))
                 debugger
                 $.ajax({
                     type: "POST",
                     url: rooturl + "/add",
-                    data: that.addbook,
+                    async: false,
+                    data: JSON.stringify(that.addbook),
                     contentType: 'application/json',
                     dataType: "json",
                     success: function (result) {
-                        alert("update success!")
+                        alert("add success!")
                     },
                     error: function (result) {
-                        alert("update failed!")
+                        if(result.status == 200 ) {
+                            alert(result.responseText )
+                            document.location = './book'
+                            return
+                        }
+                        alert("add failed!")
                     }
                 });
+                that.addbook = {"number": 0,"bookName":"","pirce": 0,"count": 0, id: ""}
+                that.addable = false;
                 that.queryall()
             },
             updateable: function (event) {
@@ -186,21 +214,23 @@
                     }
                 }
                 console.log(JSON.stringify(updatebooks))
-                debugger
+                if (updatebooks.length == 0){
+                    return
+                }
                 $.ajax({
                     type: "POST",
                     url: rooturl + "/update",
                     data: JSON.stringify(updatebooks),
                     contentType: 'application/json',
                     dataType: "json",
-                    success: function (result) {
-                        alert(result)
+                    success: function (data) {
+                        alert(data.responseText)
                     },
-                    error: function (result) {
-                        alert(result)
+                    error: function (data) {
+                        alert(data.responseText)
+                        document.location = './book'
                     }
                 });
-                that.queryall()
                 that.show = false;
             },
 
@@ -213,8 +243,8 @@
                     success: function (result) {
                         alert(result)
                     },
-                    error: function (result) {
-                        alert(result)
+                    error: function (data) {
+                        alert(data.responseText)
                     }
                 });
                 that.queryall()
@@ -226,12 +256,14 @@
                 $.ajax({
                     type: "POST",
                     url: rooturl + "/delete",
-                    data: that.checkids,
+                    contentType: 'application/json',
+                    data: JSON.stringify(that.checkids),
                     success: function (result) {
                         alert(result)
                     },
-                    error: function (result) {
-                        alert(result)
+                    error: function (data) {
+                        alert(data.responseText)
+                        document.location = './book'
                     }
                 });
                 that.queryall()
@@ -243,8 +275,8 @@
                     url: rooturl + "/query/" + id,
                     success: function (result) {
                     },
-                    error: function (result) {
-                        alert(result)
+                    error: function (data) {
+                        alert(data.responseText)
                     }
                 });
             },
@@ -257,8 +289,9 @@
                     success: function (result) {
                         that.books = result
                     },
-                    error: function (result) {
-                        alert(result)
+                    error: function (data) {
+                        that.books = result
+                        alert(data.responseText)
                     }
                 });
             }

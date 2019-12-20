@@ -2,7 +2,9 @@ package com.example.supermarket.controller;
 
 import com.example.supermarket.mapper.GoodsMapper;
 import com.example.supermarket.pojo.Goods;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,11 +20,14 @@ public class GoodsController {
 
     @PostMapping("/add")
     public ResponseEntity<String> add(@RequestBody@Validated Goods goods) {
-        goods.setBookId(UUID.randomUUID().toString());
+        goods.setBookId(UUID.randomUUID().toString().replace("-", ""));
         try {
+            if (StringUtils.isEmpty(goods.getDetail())){
+                goods.setDetail("无");
+            }
             goodsMapper.insert(goods);
         } catch (Exception e) {
-            throw new RuntimeException("添加失败:  " + e.getMessage());
+            return new ResponseEntity("添加失败:  " + e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return ResponseEntity.ok("添加成功: "+ goods.getBookName());
@@ -35,7 +40,7 @@ public class GoodsController {
                 goodsMapper.update(goods);
             }
         } catch (Exception e) {
-            throw new RuntimeException("更新失败:  " + e.getMessage());
+            return new ResponseEntity("更新失败:  " + e.getMessage() , HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return ResponseEntity.ok("更新成功 ");
@@ -46,20 +51,20 @@ public class GoodsController {
         try {
             goodsMapper.deleteByPrimaryKey(bookId);
         } catch (Exception e) {
-            throw new RuntimeException("删除失败:  " + e.getMessage());
+            return new ResponseEntity("删除失败:  " + e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return ResponseEntity.ok("删除成功");
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<String> deletes(@RequestParam List<String> bookIds) {
+    public ResponseEntity<String> deletes(@RequestBody List<String> bookIds) {
         try {
             for (String bookid : bookIds) {
                 goodsMapper.deleteByPrimaryKey(bookid);
             }
         } catch (Exception e) {
-            throw new RuntimeException("删除失败:  " + e.getMessage());
+            return new ResponseEntity("删除失败:  " + e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return ResponseEntity.ok("删除成功");
@@ -71,7 +76,7 @@ public class GoodsController {
         try {
             goods =goodsMapper.selectByPrimaryKey(bookId);
         } catch (Exception e) {
-            throw new RuntimeException("查询失败:  " + e.getMessage());
+            return new ResponseEntity("查询失败:  " + e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return ResponseEntity.ok(goods);
@@ -83,7 +88,7 @@ public class GoodsController {
         try {
             goods =goodsMapper.selectALl();
         } catch (Exception e) {
-            throw new RuntimeException("查询失败:  " + e.getMessage());
+            return new ResponseEntity("查询失败:  " + e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return ResponseEntity.ok(goods);

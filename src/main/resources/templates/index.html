@@ -1,36 +1,48 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-model="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>sign in</title>
 </head>
 <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-<style>
-    .input{
-        length: 120px;
+<style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+        list-style: none;
     }
-    .div {
+    div {
+        padding: 20px;
+    }
+
+    #Login {
         margin: 0 auto;
     }
+
 </style>
-<body>
-        <div class="div" id="app">
-            username: <input class="input" type="text" v-bind:value="user.username" >
-            password: <input class="input" type="password" v-bind:value="user.password">
-        </div>
-        <div class="div">
-            <button  v-on:click="login"> sign in </button>
-            <button   v-on:click="rigister"> register </button>
-        </div>
-</body>
+<body >
+
+<div id="Login">
+<div class="div" >
+    username: <input class="input" type="text" v-model:value="user.username" > </br>
+    password: <input class="input" type="password" v-model:value="user.password">
+</div>
+<div class="div">
+    <button  v-on:click="login"> sign in </button>
+    <button   v-on:click="rigister"> register </button>
+</div>
+
+</div>
+
 
 <script>
     var rooturl = "http://localhost:8080";
     new Vue({
-        el: '#app',
+        el: '#Login',
         data: {
-            user:{
+            user: {
                 id: "",
                 username: "",
                 password: ""
@@ -42,14 +54,23 @@
                 $.ajax({
                     type: "POST",
                     url: rooturl + "/login",
-                    data: that.user,
+                    contentType: 'application/json',
+                    data: JSON.stringify(that.user),
                     dataType: "json",
-                    success: function (result) {
-                        alert(result)
-                        document.location = './bookinfo.html'
+
+                    success : function(data) {
+                            alert("登录成功");
+                            console.log(data)
+                            document.location = './book'
                     },
-                    error: function (result) {
-                        alert(result)
+                    error: function (data) {
+                        if(data.status == 200) {
+                            that.user.password = ''
+                            alert(data.responseText)
+                            document.location = './book'
+                            return
+                        }
+                        alert(data.responseText)
                     }
                 });
             },
@@ -58,19 +79,22 @@
                 var that = this;
                 $.ajax({
                     type: "POST",
-                    url: rooturl + "/login",
-                    data: that.user,
+                    url: rooturl + "/register",
+                    contentType: 'application/json',
+                    data: JSON.stringify(that.user),
                     dataType: "json",
-                    success: function (result) {
-                        alert(result)
+                    success: function (data) {
+                        console.log(data)
+                    } ,
+                    error: function (data) {
                         that.user.password = ''
-                    },
-                    error: function (result) {
-                        alert(result)
+
+                        alert(data.responseText)
                     }
                 });
             }
         }
     });
 </script>
+</body>
 </html>

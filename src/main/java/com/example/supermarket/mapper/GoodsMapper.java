@@ -11,11 +11,11 @@ public interface GoodsMapper {
     @Select("SELECT * FROM Goods WHERE bookId=#{bookId}")
     Goods selectByPrimaryKey(String bookId);
 
-    @Insert("INSERT INTO Goods VALUES(#{bookId}, #{bookName}, #{pirce} ,#{count}, #{detail})")
+    @Insert("INSERT INTO Goods VALUES(#{bookId},#{number}, #{bookName}, #{pirce} ,#{count}, #{detail})")
     int  insert(Goods goods);
 
     @Update("UPDATE Goods SET " +
-            "bookName=#{bookName}, pirce=#{pirce},count=#{count}, detail=#{detail}" +
+            "bookName=#{bookName},number = #{number}, pirce=#{pirce},count=#{count}, detail=#{detail}" +
             "WHERE  bookId = #{bookId}")
     int update(Goods goods);
 

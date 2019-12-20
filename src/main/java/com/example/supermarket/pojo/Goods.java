@@ -1,5 +1,6 @@
 package com.example.supermarket.pojo;
 
+import org.hibernate.validator.constraints.Length;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.Min;
@@ -14,7 +15,7 @@ public class Goods {
 
     private int number;
 
-    @Min(1)
+    @Length(min=1)
     private String bookName;
 
     private double pirce;

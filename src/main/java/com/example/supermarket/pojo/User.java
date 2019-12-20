@@ -14,10 +14,10 @@ public class User {
 
     private String id;
 
-    @Min(1)
+
     private String username;
 
-    @Min(6)
+
     private String password;
 
     public String getId() {
